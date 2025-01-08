@@ -1,0 +1,37 @@
+# Ignore build and output directories
+build/
+
+# Ignore IDE specific files (e.g., VSCode, CLion, etc.)
+.vscode/
+.idea/
+
+# Ignore compiled object files
+*.o
+*.obj
+
+# Ignore compiled binaries
+*.exe
+*.out
+*.app
+*.a
+*.so
+*.dylib
+*.dll
+
+# Ignore debugging symbols
+*.dSYM/
+
+# Ignore CMake files generated for build
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+CTestTestfile.cmake
+
+# Ignore temporary or system files
+*.log
+*.tmp
+*.swp
+
+# Ignore files related to version control systems (e.g., MacOS, Windows)
+.DS_Store  # macOS specific
