@@ -35,3 +35,7 @@ CTestTestfile.cmake
 
 # Ignore files related to version control systems (e.g., MacOS, Windows)
 .DS_Store  # macOS specific
+
+# Ignore scripts
+rebuild_and_run_tests.sh
+
