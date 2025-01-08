@@ -15,19 +15,19 @@ void Bank::create_account(const std::string& id, const std::string& name, double
 }
 
 void Bank::delete_account(const std::string& id){
-    if(accounts.find(id) != accounts.end()){
-        accounts.erase(id);
-        std::cout<<"Account with the id "<<id<<" deleted successfully.";
+    if(accounts.find(id) == accounts.end()){
+        throw std::invalid_argument("Account with the given id does not exist.");
     }
-    throw std::invalid_argument("Account with the given id does not exist.");
+    accounts.erase(id);
+        std::cout<<"Account with the id "<<id<<" deleted successfully.";
 }
 
 void Bank::deposit_to_account(const std::string& id, double amount){
     auto account = accounts.find(id);
-    if(account != accounts.end()){
-        account->second.deposit(amount);
+    if(account == accounts.end()){
+        throw std::invalid_argument("Account does not exist");
     }
-    throw std::invalid_argument("Account does not exist");
+    account->second.deposit(amount);
 
 }
 void Bank::withdraw_from_account(const std::string& id, double amount){
