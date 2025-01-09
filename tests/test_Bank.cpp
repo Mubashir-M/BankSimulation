@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../src/Bank.h"
-#include "../src/BankAccount.h"
+#include "Bank.h"
+#include "BankAccount.h"
 
 
 class BankTest : public ::testing::Test {

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/BankAccount.h"
+#include "BankAccount.h"
 
 // Test case: Create account with positive initial balance
 TEST(BankAccountTest, CreateAccount) {

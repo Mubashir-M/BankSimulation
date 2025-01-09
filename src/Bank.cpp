@@ -2,6 +2,7 @@
 #include "BankAccount.h"
 
 #include <vector>
+#include <iostream>
 
 void Bank::create_account(const std::string& id, const std::string& name, double initial_balance) {
     if (accounts.find(id) != accounts.end()) {
@@ -19,7 +20,7 @@ void Bank::delete_account(const std::string& id){
         throw std::invalid_argument("Account with the given id does not exist.");
     }
     accounts.erase(id);
-        std::cout<<"Account with the id "<<id<<" deleted successfully.";
+        std::cout<<"Account deleted successfully."<<std::endl;
 }
 
 void Bank::deposit_to_account(const std::string& id, double amount){
