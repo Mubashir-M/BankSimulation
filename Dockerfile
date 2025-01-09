@@ -43,8 +43,8 @@ WORKDIR /app
 # Copy the rest of your project files to the container
 COPY . .
 
-# Build your project using CMake
-RUN mkdir -p build && cd build && cmake .. && make
+# Run the build and tests, output test results to a log file
+RUN mkdir -p build && cd build && cmake .. && make && ctest -V > /app/test_results.log
 
 # Set the default command for the container
 CMD ["./build/BankSimulation"]
