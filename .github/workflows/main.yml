@@ -39,11 +39,15 @@ jobs:
           name: demos-image
           path: /tmp/demos_${{ github.sha }}.tar
 
+      - name: Verify Test Results File
+        run: |
+          ls -l /tmp/test_results.log
+
       - name: Upload Test Results as Artifact
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: /app/test_results.log
+          path: /tmp/test_results.log
 
   push-docker-image:
     needs: build-and-test
