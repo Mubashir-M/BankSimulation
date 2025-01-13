@@ -25,8 +25,7 @@ jobs:
       - name: Verify Docker Image
         run: |
           docker images
-          docker run --rm mohamum2/demos:${{ github.sha }} bash -c "echo 'Test start' > /app/test_results.log; ctest --output-on-failure >> /app/test_results.log || echo 'Test failed' >> /app/test_results.log"
-
+          docker run --rm mohamum2/demos:${{ github.sha }} bash -c "echo 'Test start' > /app/test_results.log; cd /app/build && cmake .. && make && ctest -N >> /app/test_results.log"
       - name: Save Docker Image to .tar
         run: |
           docker save mohamum2/demos:${{ github.sha }} -o /tmp/demos_${{ github.sha }}.tar
