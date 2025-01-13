@@ -27,6 +27,16 @@ jobs:
           docker images
           docker run --rm mohamum2/demos:${{ github.sha }} bash -c "echo 'Test start' > /app/test_results.log; ctest --output-on-failure >> /app/test_results.log || echo 'Test failed' >> /app/test_results.log"
 
+      - name: Save Docker Image to .tar
+        run: |
+          docker save mohamum2/demos:${{ github.sha }} -o /tmp/demos_${{ github.sha }}.tar
+
+      - name: Upload Docker Image Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: demos-image
+          path: /tmp/demos_${{ github.sha }}.tar
+
       - name: Upload Test Results as Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -45,6 +55,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: demos-image
+          path: /tmp
+
+      - name: Load Docker Image
+        run: |
+          docker load -i /tmp/demos_${{ github.sha }}.tar
 
       - name: Push Docker Image
         run: |
