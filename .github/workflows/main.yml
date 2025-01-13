@@ -36,6 +36,11 @@ jobs:
         run: |
           ls -l /tmp/test_results.log
 
+      - name: Save Docker Image to .tar
+        run: |
+          docker save mohamum2/demos:${{ github.sha }} -o /tmp/demos_${{ github.sha }}.tar
+          ls -l /tmp/demos_${{ github.sha }}.tar
+
       - name: Upload Docker Image Artifact
         uses: actions/upload-artifact@v3
         with:
