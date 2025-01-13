@@ -19,8 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     tar \
     ca-certificates \
-    libpthread-stubs0-dev && \
-    apt-get clean
+    libpthread-stubs0-dev \
+    libgtest-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set gcc-7 and g++-7 as the default compilers
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100 \
@@ -28,14 +29,6 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100 \
 
 # Verify the GCC version
 RUN gcc --version
-
-# Install Google Test from source
-RUN cd /usr/src && \
-    git clone https://github.com/google/googletest.git && \
-    cd googletest && \
-    cmake . && \
-    make VERBOSE=1 && \
-    make install
 
 # Set the working directory in the container
 WORKDIR /app
