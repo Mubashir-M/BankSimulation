@@ -24,16 +24,13 @@ jobs:
 
       - name: Run Tests inside Docker
         run: |
-          docker run --rm mohamum2/demos:${{ github.sha }} ctest --output-on-failure
+          docker run --rm mohamum2/demos:${{ github.sha }} bash -c "ctest --output-on-failure > /app/test_results.log || true"
 
-      - name: Save Docker Image
-        run: |
-          docker save mohamum2/demos:${{ github.sha }} -o /tmp/demos.tar
-
-      - uses: actions/upload-artifact@v3
+      - name: Upload Test Results as Artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: demos-image
-          path: /tmp/demos.tar
+          name: test-results
+          path: /app/test_results.log
 
   push-docker-image:
     needs: build-and-test
@@ -41,15 +38,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Download Docker Image
-        uses: actions/download-artifact@v3
-        with:
-          name: demos-image
-
-      - name: Load Docker Image
-        run: |
-          docker load -i demos.tar
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
