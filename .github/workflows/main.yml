@@ -22,9 +22,10 @@ jobs:
         run: |
           docker build -t mohamum2/demos:${{ github.sha }} .
 
-      - name: Run Tests inside Docker
+      - name: Verify Docker Image
         run: |
-          docker run --rm mohamum2/demos:${{ github.sha }} bash -c "ctest --output-on-failure > /app/test_results.log || true"
+          docker images
+          docker run --rm mohamum2/demos:${{ github.sha }} bash -c "echo 'Test start' > /app/test_results.log; ctest --output-on-failure >> /app/test_results.log || echo 'Test failed' >> /app/test_results.log"
 
       - name: Upload Test Results as Artifact
         uses: actions/upload-artifact@v3
@@ -47,4 +48,5 @@ jobs:
 
       - name: Push Docker Image
         run: |
+          docker images
           docker push mohamum2/demos:${{ github.sha }}
