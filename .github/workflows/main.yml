@@ -14,28 +14,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Cache CMake files
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-
-      - name: Install Dependencies
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+      - name: Build and Test in Docker
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          make
-      - name: Run Tests
-        run: |
-          cd build
-          ctest --output-on-failure
-      - name: Upload test results as artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: /app/test_results.log
+          docker build -t mohamum2/bank-simulation:latest .
+          docker run --rm mohamum2/bank-simulation:latest
 
   dockerize:
     needs: build-and-test
@@ -50,7 +34,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build Docker Image
         run: |
-          docker build -t mohamum2/bank-simulation:v1.0.0 .
+          docker build -t mohamum2/bank-simulation:latest .
       - name: Push Docker Image
         run: |
-          docker push mohamum2/bank-simulation:v1.0.0
+          docker push mohamum2/bank-simulation:latest
