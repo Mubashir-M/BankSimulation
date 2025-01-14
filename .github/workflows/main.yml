@@ -25,10 +25,10 @@ jobs:
       - name: Run and Verify Docker Image
         run: |
           docker run --rm -d --name demo-container mohamum2/demos:${{ github.sha }} bash -c "
-            mkdir -p /app/build;                  # Ensure the /app/build directory is created
-            cd /app/build &&                     # Navigate to the build directory
-            cmake .. && make &&                  # Build the project
-            ctest -V > /app/test_results.log     # Run tests and log results
+            mkdir -p /app/build;
+            cd /app/build &&
+            cmake .. && make &&
+            ctest -V > /app/test_results.log
           "
 
       - name: Copy Test Results from Docker Container
