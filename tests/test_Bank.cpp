@@ -113,7 +113,7 @@ TEST_F(BankTest, TransferFromAccountToAnother_Success) {
 }
 
 TEST_F(BankTest, GetAccount_success) {
-    auto account = bank.get_account("12345");
+    BankAccount& account = bank.get_account("12345");
     EXPECT_EQ(account.get_balance(), 1000.0);
     EXPECT_EQ(account.get_owner_name(), "John Doe");
 }

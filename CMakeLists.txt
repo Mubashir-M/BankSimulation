@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Libraries
-add_library(bankaccount src/BankAccount.cpp)
+add_library(bankaccount src/BankAccount.cpp src/Transactions.cpp)
 add_library(bank src/Bank.cpp)
 target_link_libraries(bank bankaccount)
 
@@ -24,8 +24,8 @@ find_package(GTest REQUIRED)
 enable_testing()
 
 # Test executable
-add_executable(test_bank_system tests/test_BankAccount.cpp tests/test_Bank.cpp)
-target_link_libraries(test_bank_system bankaccount bank GTest::GTest GTest::Main pthread)
+add_executable(test_bank_system tests/test_BankAccount.cpp tests/test_Bank.cpp tests/test_Transactions.cpp)
+target_link_libraries(test_bank_system bank GTest::GTest GTest::Main pthread)
 
 # Register test
 add_test(NAME test_bank_system COMMAND test_bank_system)
