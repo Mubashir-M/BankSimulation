@@ -1,10 +1,12 @@
 #ifndef BANK_H
 #define BANK_H
+
 #include <iostream>
 #include <unordered_map>
 #include <vector>
 
 #include "BankAccount.h"
+#include "Transactions.h"
 
 class Bank {
     public:
@@ -16,8 +18,9 @@ class Bank {
         const std::unordered_map<std::string, BankAccount>& get_accounts() const;
         BankAccount& get_account(const std::string& id);
         std::vector<std::string> list_accounts() const;
+
     private:
-        std::unordered_map<std::string, BankAccount> accounts;
+        std::unordered_map<std::string,BankAccount> accounts_;
 };
 
-#endif //BANK_H
+#endif // BANK_H

@@ -9,6 +9,7 @@ TEST(BankAccountTest, CreateAccount) {
     EXPECT_DOUBLE_EQ(account.get_balance(), 100.0);
 }
 
+
 // Test case: Deposit money into the account
 TEST(BankAccountTest, Deposit) {
     BankAccount account("12345", "John Doe", 100.0);

@@ -1,0 +1,9 @@
+#ifndef TRANSACTION_TYPES_H
+#define TRANSACTION_TYPES_H
+
+enum TransactionTypes {
+    DEPOSIT,
+    WITHDRAWAL,
+    TRANSFER
+};
+#endif //TRANSACTION_TYPES_H
