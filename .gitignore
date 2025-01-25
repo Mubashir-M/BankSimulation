@@ -39,3 +39,5 @@ CTestTestfile.cmake
 # Ignore scripts
 rebuild_and_run_tests.sh
 
+# Ignore imgui
+/external/
