@@ -46,13 +46,13 @@ jobs:
           ls -l /tmp/demos_${{ github.sha }}.tar
 
       - name: Upload Docker Image Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: demos-image
           path: /tmp/demos_${{ github.sha }}.tar
 
       - name: Upload Test Results as Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: /tmp/test_results.log
