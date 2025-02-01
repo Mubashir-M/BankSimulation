@@ -10,13 +10,15 @@ protected:
     void SetUp() override {
         std::string account_id1 = "12345";
         std::string name1 = "John Doe";
+        std::string password1 = "55550";
         double initial_balance1 = 1000.0;
-        bank.create_account(account_id1, name1, initial_balance1);
+        bank.create_account(account_id1, password1, name1, initial_balance1);
 
         std::string account_id2 = "67890";
         std::string name2 = "Jane Doe";
+        std::string password2 = "55551";
         double initial_balance2 = 1500.0;
-        bank.create_account(account_id2, name2, initial_balance2);
+        bank.create_account(account_id2, password2, name2, initial_balance2);
 
     }
 
@@ -26,10 +28,11 @@ protected:
 TEST_F(BankTest, CreateAccount_Success) {
     std::string account_id = "1111";
     std::string name = "New Account";
+    std::string password = "55552";
     double initial_balance = 1000.0;
 
     // Create the account
-    EXPECT_NO_THROW(bank.create_account(account_id, name, initial_balance));
+    EXPECT_NO_THROW(bank.create_account(account_id, password, name, initial_balance));
 
 
     std::vector<std::string> accounts = bank.list_accounts();
@@ -42,10 +45,11 @@ TEST_F(BankTest, CreateAccount_Success) {
 TEST_F(BankTest, CreateAccount_AlreadyExists) {
     std::string account_id = "12345";
     std::string name = "John Doe";
+    std::string password = "55553";
     double initial_balance = 1000.0;
 
     // Try creating the same account again (should throw exception)
-    EXPECT_THROW(bank.create_account(account_id, name, initial_balance),
+    EXPECT_THROW(bank.create_account(account_id, password, name, initial_balance),
                  std::invalid_argument);
 }
 

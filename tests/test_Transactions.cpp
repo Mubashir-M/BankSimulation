@@ -8,7 +8,8 @@ protected:
     Transactions* test_transaction;
 
     void SetUp() override {
-        test_account = new BankAccount("12345", "Test User", 500.0);
+        std::string hashed_password = BankAccount::hash_password("55550");
+        test_account = new BankAccount("12345", "Test User", 500.0, hashed_password);
 
         std::string transaction_id = "TX-1001";
         TransactionTypes type = TransactionTypes::DEPOSIT;

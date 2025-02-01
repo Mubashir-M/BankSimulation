@@ -1,8 +1,7 @@
-# Start from your base image
 FROM ubuntu:20.04
 
 # Set the timezone for the container
-ENV TZ=Europe/Berlin
+ENV TZ=Europe/Helsinki
 
 # Set environment variables to avoid interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,23 +10,28 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
-    gcc-7 \
-    g++-7 \
-    clang-10 \
+    gcc \
+    g++ \
+    clang \
     build-essential \
+    make \
     cmake \
     unzip \
     tar \
     ca-certificates \
+    libc6-dev \
     libpthread-stubs0-dev \
-    libgtest-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    libssl-dev \
+    libgtest-dev \
+    libsdl2-dev \
+    libsdl2-2.0-0 \
+    libglew-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set gcc-7 and g++-7 as the default compilers
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100 \
-    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100
+# Copy the external directory into the Docker image
+COPY external /app/external
 
-# Verify the GCC version
+# Verify the GCC version (ensure it's installed and works)
 RUN gcc --version
 
 # Set the working directory in the container
@@ -36,7 +40,18 @@ WORKDIR /app
 # Copy the rest of your project files to the container
 COPY . .
 
-# Run the build and tests, output test results to a log file
+# Build GoogleTest directly from the source
+RUN rm -rf /usr/src/gtest && \
+    mkdir -p /usr/src/gtest && \
+    cd /usr/src/gtest && \
+    git clone https://github.com/google/googletest.git . && \
+    cmake . && \
+    make && \
+    cp -a lib/* /usr/local/lib/ && \
+    cp -a googletest/include/* /usr/local/include/ && \
+    cp -a googlemock/include/* /usr/local/include/
+
+# Create build directory, run cmake and make to build the project and run tests
 RUN mkdir -p build && cd build && cmake .. && make && ctest -V > /app/test_results.log
 
 # Set the default command for the container

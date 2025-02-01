@@ -10,7 +10,7 @@
 
 class Bank {
     public:
-        void create_account(const std::string& id, const std::string& name, double initial_balance);
+        void create_account(const std::string& id, const std::string& password, const std::string& name, double initial_balance);
         void delete_account(const std::string& id);
         void deposit_to_account(const std::string& id, double amount);
         void withdraw_from_account(const std::string& id, double amount);
@@ -24,3 +24,4 @@ class Bank {
 };
 
 #endif // BANK_H
+ 
