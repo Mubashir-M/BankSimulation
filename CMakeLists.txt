@@ -28,6 +28,12 @@ include_directories(${GLEW_INCLUDE_DIRS})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
+# Include imgui directory
+include_directories(${CMAKE_SOURCE_DIR}/external/imgui)
+include_directories(${CMAKE_SOURCE_DIR}/external/imgui/backends)
+
+
+
 # Add source libraries
 add_library(bankaccount src/BankAccount.cpp src/Transactions.cpp)
 add_library(uihandler src/UIHandler.cpp)
@@ -35,6 +41,7 @@ add_library(bank src/Bank.cpp)
 
 target_link_libraries(bank bankaccount)
 target_link_libraries(bankaccount OpenSSL::SSL OpenSSL::Crypto)
+
 target_link_libraries(uihandler bank)
 
 # Link libraries based on the platform
