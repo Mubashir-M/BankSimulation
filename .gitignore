@@ -41,9 +41,5 @@ rebuild_and_run_tests.sh
 rebuild.sh
 quick.sh
 
-
-# Ignore imgui
-/external/
-
 # Ignore fix.txt (contains error needing fixings)
 fix.txt
