@@ -28,12 +28,6 @@ include_directories(${GLEW_INCLUDE_DIRS})
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
-# Include imgui directory
-include_directories(${CMAKE_SOURCE_DIR}/external/imgui)
-include_directories(${CMAKE_SOURCE_DIR}/external/imgui/backends)
-
-
-
 # Add source libraries
 add_library(bankaccount src/BankAccount.cpp src/Transactions.cpp)
 add_library(uihandler src/UIHandler.cpp)
@@ -69,6 +63,9 @@ endif()
 
 # Include and add ImGui sources
 include_directories(external/imgui)
+include_directories(${CMAKE_SOURCE_DIR}/external/imgui)
+include_directories(${CMAKE_SOURCE_DIR}/external/imgui/backends)
+
 file(GLOB IMGUI_SOURCES 
     external/imgui/imgui.cpp 
     external/imgui/imgui_demo.cpp 

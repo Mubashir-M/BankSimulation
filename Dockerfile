@@ -28,10 +28,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglew-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Clone and install ImGui
-RUN git clone https://github.com/ocornut/imgui.git /usr/src/imgui && \
-    cp -a /usr/src/imgui/*.h /usr/local/include/
-
+# Copy the external directory into the Docker image
+COPY external /app/external
 
 # Verify the GCC version (ensure it's installed and works)
 RUN gcc --version
