@@ -6,13 +6,16 @@
 #include <iostream>
 #include <memory>
 
-void Bank::create_account(const std::string& id, const std::string& name, double initial_balance) {
+
+void Bank::create_account(const std::string& id, const std::string& password, const std::string& name, double initial_balance) {
     if (accounts_.find(id) != accounts_.end()) {
         // Throw an exception if account already exists
         throw std::invalid_argument("Account with this id already exists.");
     }
 
-    BankAccount new_account(id, name, initial_balance);
+    std::string hashed_password = BankAccount::hash_password(password);
+
+    BankAccount new_account(id, name, initial_balance, hashed_password);
     accounts_.emplace(id, new_account);
     std::cout << "Created a new account successfully." << std::endl;
 }
