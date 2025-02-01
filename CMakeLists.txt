@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
+
+# Project name
 project(BankSimulation)
 
 # Set C++ standard
@@ -8,32 +10,54 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Include directories for your project
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# SDL2
-include_directories("/opt/homebrew/Cellar/sdl2/2.30.11/include/SDL2")
-link_directories("/opt/homebrew/Cellar/sdl2/2.30.11/lib")
+# Find SDL2 package
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
 
-# GLEW
-include_directories("/opt/homebrew/Cellar/glew/2.2.0_1/include")
-link_directories("/opt/homebrew/Cellar/glew/2.2.0_1/lib")
+# Main executable
+add_executable(BankSimulation src/main.cpp)
 
-# OpenSSL
-set(OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl@3)
+# Link SDL2 library
+target_link_libraries(BankSimulation ${SDL2_LIBRARIES})
+
+# Find GLEW package
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+
+# Find OpenSSL package
 find_package(OpenSSL REQUIRED)
-include_directories(${OPENSSL_INCLUDE_DIR})  # Use OpenSSL's include directory
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 # Add source libraries
 add_library(bankaccount src/BankAccount.cpp src/Transactions.cpp)
 add_library(uihandler src/UIHandler.cpp)
 add_library(bank src/Bank.cpp)
+
 target_link_libraries(bank bankaccount)
+target_link_libraries(bankaccount OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(uihandler bank)
 
-# Main executable
-add_executable(BankSimulation src/main.cpp)
-
+# Link libraries based on the platform
 if(APPLE)
-    target_link_libraries(BankSimulation bank uihandler SDL2 GLEW "-framework OpenGL" OpenSSL::SSL OpenSSL::Crypto)
+    target_link_libraries(BankSimulation 
+        bank 
+        uihandler 
+        GLEW::GLEW 
+        "-framework OpenGL"
+        OpenSSL::SSL 
+        OpenSSL::Crypto
+        dl
+    )
 else()
-    target_link_libraries(BankSimulation bank uihandler SDL2 GLEW OpenGL OpenSSL::SSL OpenSSL::Crypto)
+    target_link_libraries(BankSimulation 
+        bank 
+        uihandler 
+        GLEW::GLEW 
+        OpenGL 
+        OpenSSL::SSL 
+        OpenSSL::Crypto
+        dl
+    )
 endif()
 
 # Include and add ImGui sources
@@ -53,7 +77,7 @@ target_sources(BankSimulation PRIVATE ${IMGUI_SOURCES})
 find_package(GTest REQUIRED)
 enable_testing()
 
-# Add your test executable (this already includes the necessary files for tests)
+# Add your test executable
 add_executable(test_bank_system 
     tests/test_BankAccount.cpp 
     tests/test_Bank.cpp 
