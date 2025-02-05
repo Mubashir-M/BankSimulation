@@ -26,16 +26,21 @@ jobs:
 
       - name: Run and Verify Docker Image
         run: |
-          docker run --rm -d --name demo-container mohamum2/demos:${{ github.sha }} bash -c "
+          docker run --rm -d --name demo-container --dns 8.8.8.8 mohamum2/demos:${{ github.sha }} bash -c "
             mkdir -p /app/build;
             cd /app/build &&
             cmake .. && make &&
             ctest -V > /app/test_results.log
           "
 
+      - name: Ensure Container is Stopped and Removed
+        run: |
+          docker stop demo-container || true
+          docker rm demo-container || true
+
       - name: Copy Test Results from Docker Container
         run: |
-          docker cp demo-container:/app/test_results.log /tmp/test_results.log
+          docker cp demo-container:/app/test_results.log /tmp/test_results.log || echo "Failed to copy test results"
 
       - name: Verify Test Results File
         run: |
