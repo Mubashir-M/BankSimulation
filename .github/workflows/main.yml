@@ -33,11 +33,6 @@ jobs:
             ctest -V > /app/test_results.log
           "
 
-      - name: Ensure Container is Stopped and Removed
-        run: |
-          docker stop demo-container || true
-          docker rm demo-container || true
-
       - name: Copy Test Results from Docker Container
         run: |
           docker cp demo-container:/app/test_results.log /tmp/test_results.log || echo "Failed to copy test results"
