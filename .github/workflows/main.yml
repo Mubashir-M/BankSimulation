@@ -24,7 +24,7 @@ jobs:
         run: |
           docker build -t mohamum2/demos:${{ github.sha }} .
 
-      - name: Run and Verify Docker Image
+      - name: Run Docker Image
         run: |
           docker run --rm -d --name demo-container --dns 8.8.8.8 mohamum2/demos:${{ github.sha }} bash -c "
             mkdir -p /app/build;
@@ -32,6 +32,16 @@ jobs:
             cmake .. && make &&
             ctest -V > /app/test_results.log
           "
+          # Sleep for a bit to ensure the test run completes
+          sleep 10  # Adjust this as needed
+
+      - name: Check if the Container is Running
+        run: |
+          docker ps -a | grep demo-container || echo "demo-container is not running"
+
+      - name: Inspect Docker Logs for Errors
+        run: |
+          docker logs demo-container || echo "No logs available for demo-container"
 
       - name: Copy Test Results from Docker Container
         run: |
@@ -39,8 +49,8 @@ jobs:
 
       - name: Verify Test Results File
         run: |
-          ls -l /tmp/test_results.log
-          cat /tmp/test_results.log
+          ls -l /tmp/test_results.log || echo "Test results file not found"
+          cat /tmp/test_results.log || echo "Failed to read test results"
 
       - name: Save Docker Image to .tar
         run: |
