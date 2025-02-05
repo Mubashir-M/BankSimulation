@@ -58,6 +58,7 @@ int main() {
     bool running = true;
     DataBaseManager db_manager("bank.db");
     Bank bank(db_manager);
+    UIHandler uihandler(bank);
     std::string errorMessage;
     char nameBuffer[128] = "";
     char idBuffer[128] = "";
@@ -82,9 +83,9 @@ int main() {
         ImGui::NewFrame();
 
         if (!loggedIn){
-            showLoginWindow(loggedIn, userName, bankId, password, errorMessage, bank, nameBuffer, idBuffer, passwordBuffer, bufferSize);
+            uihandler.showLoginWindow(loggedIn, userName, bankId, password, errorMessage, nameBuffer, idBuffer, passwordBuffer, bufferSize);
         } else {
-            showLoggedInWindow(loggedIn, userName, bankId, transferId, errorMessage, bank, amount, nameBuffer, idBuffer, transferIdBuffer, amountBuffer, bufferSize);
+            uihandler.showLoggedInWindow(loggedIn, userName, bankId, transferId, errorMessage, amount, nameBuffer, idBuffer, transferIdBuffer, amountBuffer, bufferSize);
         }
 
         // Rendering

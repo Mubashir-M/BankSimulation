@@ -4,7 +4,9 @@
 #include <iostream>
 #include <string>
 
-void showLoginWindow(bool& loggedIn, std::string& userName, std::string& bankId, std::string& password, std::string& errorMessage, Bank& bank, char nameBuffer[128], char idBuffer[128], char passwordBuffer[128], int bufferSize) {
+UIHandler::UIHandler(Bank& bank) : m_bank(bank), m_account(nullptr) {}
+
+void UIHandler::showLoginWindow(bool& loggedIn, std::string& userName, std::string& bankId, std::string& password, std::string& errorMessage, char nameBuffer[128], char idBuffer[128], char passwordBuffer[128], int bufferSize) {
     ImGui::SetNextWindowSize(ImVec2(500, 300));
     ImGui::Begin("Login");
 
@@ -25,8 +27,8 @@ void showLoginWindow(bool& loggedIn, std::string& userName, std::string& bankId,
 
     if (ImGui::Button("Login")) {
         try {
-            std::shared_ptr<BankAccount> account = bank.get_account(bankId);
-            if (account->check_password(password)){
+            m_account = m_bank.get_account(bankId);
+            if (m_account && m_account->check_password(password)){
                 loggedIn = true;
                 std::cout << "Logged in successfully!" << std::endl;
                 // Clear the name and id buffers after successful login
@@ -52,7 +54,7 @@ void showLoginWindow(bool& loggedIn, std::string& userName, std::string& bankId,
             std::cerr << errorMessage << std::endl;
         } else {
             try {
-                bank.create_account(bankId, password, userName, 0.0);
+                m_bank.create_account(bankId, password, userName, 0.0);
                 errorMessage.clear();
                 loggedIn = true;
                 std::cout << "Created an account for " << userName << "." << std::endl;
@@ -72,13 +74,13 @@ void showLoginWindow(bool& loggedIn, std::string& userName, std::string& bankId,
     ImGui::End();
 }
 
-void showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bankId, std::string& transferId, std::string& errorMessage, Bank& bank, double& amount, char nameBuffer[128], char transferIdBuffer[128], char idBuffer[128], char amountBuffer[128], int bufferSize) {
+void UIHandler::showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bankId, std::string& transferId, std::string& errorMessage, double& amount, char nameBuffer[128], char transferIdBuffer[128], char idBuffer[128], char amountBuffer[128], int bufferSize) {
     ImGui::SetNextWindowSize(ImVec2(500, 300));
     ImGui::Begin("Logged In");
 
     ImGui::Text("Welcome to the Bank Simulation!");
-    ImGui::Text("Bank Name: %s", bank.get_account(bankId)->get_owner_name().c_str());
-    ImGui::Text("Your bank account has a balance of %.2f", bank.get_account(bankId)->get_balance());
+    ImGui::Text("Bank Name: %s", m_account->get_owner_name().c_str());
+    ImGui::Text("Your bank account has a balance of %.2f", m_account->get_balance());
 
     // Button to perform the transfer
     if (ImGui::Button("Transfer Money")) {
@@ -89,9 +91,9 @@ void showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bank
         } else {
             try {
                 // Attempt the transfer
-                bank.transfer(bankId, transferId, amount);
+                m_bank.transfer(bankId, transferId, amount);
                 errorMessage.clear();
-                std::cout << "Transferred " << amount << " to " << transferId << std::endl;
+                m_account = m_bank.get_account(bankId);
 
                 // **Reset the fields after a successful transfer**
                 amount = 0.0;
@@ -115,12 +117,13 @@ void showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bank
             errorMessage = "Amount must be greater than zero!";
         } else {
             try {
-                double old_balance = bank.get_account(bankId)->get_balance();
+                double old_balance = m_account->get_balance();
                 // Perform the deposit operation
-                bank.deposit_to_account(bankId, amount);
+                m_bank.deposit_to_account(bankId, amount);
 
                 // If the deposit succeeds, reset the variables
-                if ( bank.get_account(bankId)->get_balance() - old_balance  == amount){
+                if ( m_bank.get_account(bankId)->get_balance() - old_balance  == amount){
+                    m_account = m_bank.get_account(bankId);
                     amount = 0.0;
                     amountBuffer[0] = '\0';
 
@@ -146,9 +149,10 @@ void showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bank
             errorMessage = "Amount must be greater than zero!";
         } else {
             try {
-                bank.withdraw_from_account(bankId, amount);
+                m_bank.withdraw_from_account(bankId, amount);
                 amount = 0.0;
                 amountBuffer[0] = '\0';
+                m_account = m_bank.get_account(bankId);
             } catch (const std::invalid_argument& e){
                 errorMessage = std::string("Widthdraw failed: ") + e.what();
             } catch (const std::exception& e) {
