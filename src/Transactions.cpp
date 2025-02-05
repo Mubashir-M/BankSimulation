@@ -1,6 +1,7 @@
-#include <iostream>
 #include "Transactions.h"
 #include "BankAccount.h"
+
+#include <iostream>
 
 Transactions::Transactions(
     std::string transaction_id,

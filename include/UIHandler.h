@@ -2,8 +2,9 @@
 #ifndef UIHANDLER_H
 #define UIHANDLER_H
 
-#include <string>
 #include "Bank.h"
+
+#include <string>
 
 // Function declarations
 void showLoginWindow(bool& loggedIn, std::string& userName ,std::string& bankId, std::string& password, std::string& errorMessage, Bank& bank, char nameBuffer[128], char idBuffer[128], char passwordBuffer[128], int bufferSize);

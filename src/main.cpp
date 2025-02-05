@@ -1,3 +1,7 @@
+#include "Bank.h"
+#include "BankAccount.h"
+#include "UIHandler.h"
+
 #include <SDL.h>
 #include "GL/glew.h"
 
@@ -6,9 +10,6 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_opengl3.h"
 
-#include "Bank.h"
-#include "BankAccount.h"
-#include "UIHandler.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -55,7 +56,8 @@ int main() {
 
     bool loggedIn = false;
     bool running = true;
-    Bank bank;
+    DataBaseManager db_manager("bank.db");
+    Bank bank(db_manager);
     std::string errorMessage;
     char nameBuffer[128] = "";
     char idBuffer[128] = "";

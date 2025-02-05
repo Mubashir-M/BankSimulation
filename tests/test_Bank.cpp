@@ -1,123 +1,161 @@
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
+
+#include "DataBaseManager.h"
 #include "Bank.h"
 #include "BankAccount.h"
+
+using ::testing::Return;
+using ::testing::Throw;
+using ::testing::_;
+
+// Mock class for DataBaseManager
+class MockDataBaseManager : public DataBaseManager {
+public:
+    MockDataBaseManager(const std::string& db_file) : DataBaseManager(db_file) {}
+
+    MOCK_METHOD(void, create_account, (const std::string&, const std::string&, const std::string&, double), (override));
+    MOCK_METHOD(void, delete_account, (const std::string&), (override));
+    MOCK_METHOD(std::shared_ptr<BankAccount>, get_account, (const std::string&), (override));
+    MOCK_METHOD(std::shared_ptr<Transactions>, get_transaction, (const std::string&), (override));
+    MOCK_METHOD(std::vector<std::string>, list_accounts, (), (const, override)); // Make sure const here
+    MOCK_METHOD(void, add_transaction, (const std::string&, TransactionTypes, const std::string&, const std::string&, double, const std::string&), (override));
+    MOCK_METHOD(void, deposit_to_account, (const std::string&, double), (override));
+    MOCK_METHOD(void, withdraw_from_account, (const std::string&, double), (override));
+    MOCK_METHOD(void, transfer, (const std::string&, const std::string&, double), (override));
+    MOCK_METHOD(std::string, enum_to_string_types, (TransactionTypes), (const, override)); // Make sure const here
+    MOCK_METHOD(TransactionTypes, string_to_enum_types, (const std::string&), (const, override)); // Make sure const here
+};
 
 
 class BankTest : public ::testing::Test {
 protected:
+    MockDataBaseManager mock_db{"mock_db_file.db"};
     Bank bank;
 
+    BankTest() : bank(mock_db) {}
+
     void SetUp() override {
-        std::string account_id1 = "12345";
-        std::string name1 = "John Doe";
-        std::string password1 = "55550";
-        double initial_balance1 = 1000.0;
-        bank.create_account(account_id1, password1, name1, initial_balance1);
+        std::cout << "Setting up BankTest...\n";
 
-        std::string account_id2 = "67890";
-        std::string name2 = "Jane Doe";
-        std::string password2 = "55551";
-        double initial_balance2 = 1500.0;
-        bank.create_account(account_id2, password2, name2, initial_balance2);
+        EXPECT_CALL(mock_db, list_accounts())
+            .WillRepeatedly(Return(std::vector<std::string>{})); // Start empty
 
+        EXPECT_CALL(mock_db, create_account("12345", "55550", "John Doe", 1000.0))
+            .Times(1);
+        EXPECT_CALL(mock_db, create_account("67890", "55551", "Jane Doe", 1500.0))
+            .Times(1);
+
+        std::cout << "Creating account 12345...\n";
+        bank.create_account("12345", "55550", "John Doe", 1000.0);
+        
+        std::cout << "Creating account 67890...\n";
+        bank.create_account("67890", "55551", "Jane Doe", 1500.0);
+
+        EXPECT_CALL(mock_db, list_accounts())
+            .WillRepeatedly(Return(std::vector<std::string>{"12345", "67890"})); // Now accounts exist
+
+        std::cout << "Finished SetUp()\n";
     }
 
 };
 
 // Test case for creating a new account successfully
 TEST_F(BankTest, CreateAccount_Success) {
-    std::string account_id = "1111";
-    std::string name = "New Account";
-    std::string password = "55552";
-    double initial_balance = 1000.0;
+    EXPECT_CALL(mock_db, create_account("1111", "55552", "New Account", 1000.0)).Times(1);
 
-    // Create the account
-    EXPECT_NO_THROW(bank.create_account(account_id, password, name, initial_balance));
+    EXPECT_CALL(mock_db, list_accounts())
+        .WillOnce(Return(std::vector<std::string>{"12345", "67890"})) // First call: before account creation
+        .WillOnce(Return(std::vector<std::string>{"12345", "67890", "1111"})); // Second call: after creation
 
+    EXPECT_NO_THROW(bank.create_account("1111", "55552", "New Account", 1000.0));
 
     std::vector<std::string> accounts = bank.list_accounts();
     EXPECT_EQ(accounts.size(), 3);
-    auto it = bank.get_accounts().find(account_id);
-    EXPECT_TRUE(it != bank.get_accounts().end());
 }
+
 
 // Test case for trying to create an account with an existing ID (should throw an exception)
 TEST_F(BankTest, CreateAccount_AlreadyExists) {
-    std::string account_id = "12345";
-    std::string name = "John Doe";
-    std::string password = "55553";
-    double initial_balance = 1000.0;
+    EXPECT_CALL(mock_db, list_accounts())
+    .WillRepeatedly(Return(std::vector<std::string>{"12345", "67890"}));
 
-    // Try creating the same account again (should throw exception)
-    EXPECT_THROW(bank.create_account(account_id, password, name, initial_balance),
-                 std::invalid_argument);
+    EXPECT_THROW(bank.create_account("12345", "55553", "John Doe", 1000.0), std::invalid_argument);
 }
 
-TEST_F(BankTest, DeleteAccount_Success){
+// Test case for deleting an account
+TEST_F(BankTest, DeleteAccount_Success) {
+    EXPECT_CALL(mock_db, delete_account("12345")).Times(1);
+    EXPECT_CALL(mock_db, list_accounts()).WillRepeatedly(Return(std::vector<std::string>{"67890"}));
+
+    EXPECT_NO_THROW(bank.delete_account("12345"));
+
     std::vector<std::string> accounts = bank.list_accounts();
-
-    EXPECT_EQ(accounts.size(), 2);
-
-    // Delete account with id 12345
-    bank.delete_account("12345");
-
-    //Check that account is deleted
-    accounts = bank.list_accounts();
     EXPECT_EQ(accounts.size(), 1);
-
-    auto it = bank.get_accounts().find("12345");
-    EXPECT_TRUE(it == bank.get_accounts().end());
 }
 
+// Test case for depositing money into an account
 TEST_F(BankTest, DepositToAccount_Success) {
-    std::string account_id = "12345";
-    double deposit_amount = 500.0;
+    EXPECT_CALL(mock_db, deposit_to_account("12345", 500.0)).Times(1);
 
-    BankAccount& account = bank.get_account(account_id);
-    EXPECT_EQ(account.get_balance(), 1000.0);
+    // Mock get_account to return an updated balance after deposit
+    BankAccount updated_account("12345", "John Doe", 1500.0, BankAccount::hash_password("55550"));
+    std::shared_ptr<BankAccount> updatedAccountPtr = std::make_shared<BankAccount>(updated_account);
 
-    // deposit money to the account
-    EXPECT_NO_THROW(bank.deposit_to_account(account_id, deposit_amount));
+    EXPECT_CALL(mock_db, get_account("12345")).WillOnce(Return(updatedAccountPtr));
 
-    // Ensure the balance is updated correctly
-    EXPECT_EQ(account.get_balance(), 1500.0);
+    EXPECT_NO_THROW(bank.deposit_to_account("12345", 500.0));
+
+    // Verify the balance is now 1500
+    std::shared_ptr<BankAccount> retrievedAccount = bank.get_account("12345");
+    EXPECT_EQ(retrievedAccount->get_balance(), 1500.0);
 }
 
+
+// Test case for withdrawing money from an account
 TEST_F(BankTest, WithdrawFromAccount_Success) {
-    std::string account_id = "12345";
-    double withdrawal_amount = 500.0;
+    EXPECT_CALL(mock_db, withdraw_from_account("12345", 500.0)).Times(1);
 
-    BankAccount& account = bank.get_account(account_id);
-    EXPECT_EQ(account.get_balance(), 1000.0);
+    BankAccount updated_account("12345", "John Doe", 500.0, BankAccount::hash_password("55550"));
+    std::shared_ptr<BankAccount> updatedAccountPtr = std::make_shared<BankAccount>(updated_account);
 
-    // Withdraw money from the account
-    EXPECT_NO_THROW(bank.withdraw_from_account(account_id, withdrawal_amount));
+    EXPECT_CALL(mock_db, get_account("12345")).WillOnce(Return(updatedAccountPtr));
+    EXPECT_NO_THROW(bank.withdraw_from_account("12345", 500.0));
 
-    // Ensure the balance is updated correctly
-    EXPECT_EQ(account.get_balance(), 500.0);
+    std::shared_ptr<BankAccount> retrievedAccount = bank.get_account("12345");
+    EXPECT_EQ(retrievedAccount->get_balance(), 500.0);
 }
 
+// Test case for transferring money between accounts
 TEST_F(BankTest, TransferFromAccountToAnother_Success) {
-    std::string account_from_id = "12345";
-    std::string account_to_id = "67890";
-    double transfer_amount = 500.0;
+    EXPECT_CALL(mock_db, transfer("12345", "67890", 500.0)).Times(1);
 
-    BankAccount& account_from = bank.get_account(account_from_id);
-    BankAccount& account_to = bank.get_account(account_to_id);
+    BankAccount updated_account_from("12345", "John Doe", 500.0, BankAccount::hash_password("55550"));
+    BankAccount updated_account_to("67890", "Jane Doe", 2000.0, BankAccount::hash_password("55551"));
 
-    EXPECT_EQ(account_from.get_balance(), 1000.0);
-    EXPECT_EQ(account_to.get_balance(), 1500.0);
+    std::shared_ptr<BankAccount> updated_account_from_ptr = std::make_shared<BankAccount>(updated_account_from);
+    std::shared_ptr<BankAccount> updated_account_to_ptr = std::make_shared<BankAccount>(updated_account_to);
 
-    // transfer money
-    EXPECT_NO_THROW(bank.transfer(account_from_id, account_to_id, transfer_amount));
+    EXPECT_CALL(mock_db, get_account("12345")).WillOnce(Return(updated_account_from_ptr));
+    EXPECT_CALL(mock_db, get_account("67890")).WillOnce(Return(updated_account_to_ptr));
 
-    // Ensure the balance is updated correctly
-    EXPECT_EQ(account_from.get_balance(), 500.0);
-    EXPECT_EQ(account_to.get_balance(), 2000.0);
+     std::shared_ptr<BankAccount> retrievedAccount_from = bank.get_account("12345");
+     std::shared_ptr<BankAccount> retrievedAccount_to = bank.get_account("67890");
+
+    EXPECT_NO_THROW(bank.transfer("12345", "67890", 500.0));
+
+    EXPECT_EQ(retrievedAccount_from->get_balance(), 500.0);
+    EXPECT_EQ(retrievedAccount_to->get_balance(), 2000.0);
 }
 
-TEST_F(BankTest, GetAccount_success) {
-    BankAccount& account = bank.get_account("12345");
-    EXPECT_EQ(account.get_balance(), 1000.0);
-    EXPECT_EQ(account.get_owner_name(), "John Doe");
+// Test case for getting account details
+TEST_F(BankTest, GetAccount_Success) {
+    BankAccount account("12345", "John Doe", 1000.0, BankAccount::hash_password("55550"));
+    std::shared_ptr<BankAccount> accountPtr = std::make_shared<BankAccount>(account);
+    
+    EXPECT_CALL(mock_db, get_account("12345")).WillOnce(Return(accountPtr));
+
+    std::shared_ptr<BankAccount> retrievedAccount = bank.get_account("12345");
+    EXPECT_EQ(retrievedAccount->get_balance(), 1000.0);
+    EXPECT_EQ(retrievedAccount->get_owner_name(), "John Doe");
 }
