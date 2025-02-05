@@ -1,6 +1,6 @@
-// UIHandler.cpp
 #include "UIHandler.h"
-#include "imgui.h" // For ImGui UI
+
+#include "imgui.h"
 #include <iostream>
 #include <string>
 
@@ -25,8 +25,8 @@ void showLoginWindow(bool& loggedIn, std::string& userName, std::string& bankId,
 
     if (ImGui::Button("Login")) {
         try {
-            BankAccount& account = bank.get_account(bankId);
-            if (account.check_password(password)){
+            std::shared_ptr<BankAccount> account = bank.get_account(bankId);
+            if (account->check_password(password)){
                 loggedIn = true;
                 std::cout << "Logged in successfully!" << std::endl;
                 // Clear the name and id buffers after successful login
@@ -77,8 +77,8 @@ void showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bank
     ImGui::Begin("Logged In");
 
     ImGui::Text("Welcome to the Bank Simulation!");
-    ImGui::Text("Bank Name: %s", bank.get_account(bankId).get_owner_name().c_str());
-    ImGui::Text("Your bank account has a balance of %.2f", bank.get_account(bankId).get_balance());
+    ImGui::Text("Bank Name: %s", bank.get_account(bankId)->get_owner_name().c_str());
+    ImGui::Text("Your bank account has a balance of %.2f", bank.get_account(bankId)->get_balance());
 
     // Button to perform the transfer
     if (ImGui::Button("Transfer Money")) {
@@ -115,12 +115,12 @@ void showLoggedInWindow(bool& loggedIn, std::string& userName, std::string& bank
             errorMessage = "Amount must be greater than zero!";
         } else {
             try {
-                double old_balance = bank.get_account(bankId).get_balance();
+                double old_balance = bank.get_account(bankId)->get_balance();
                 // Perform the deposit operation
                 bank.deposit_to_account(bankId, amount);
 
                 // If the deposit succeeds, reset the variables
-                if ( bank.get_account(bankId).get_balance() - old_balance  == amount){
+                if ( bank.get_account(bankId)->get_balance() - old_balance  == amount){
                     amount = 0.0;
                     amountBuffer[0] = '\0';
 

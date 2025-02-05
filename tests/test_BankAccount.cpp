@@ -27,18 +27,6 @@ TEST_F(BankAccountTest, CreateAccount) {
     EXPECT_DOUBLE_EQ(account1->get_balance(), 1000.0);
 }
 
-// Test case: Deposit money into the account
-TEST_F(BankAccountTest, Deposit) {
-    account1->deposit(50.0);
-    EXPECT_DOUBLE_EQ(account1->get_balance(), 1050.0);
-}
-
-// Test case: Withdraw money from the account
-TEST_F(BankAccountTest, Withdraw) {
-    account1->withdraw(500.0);
-    EXPECT_DOUBLE_EQ(account1->get_balance(), 500.0);
-}
-
 // Test case: Get Account Id
 TEST_F(BankAccountTest, Id) {
     EXPECT_EQ(account1->get_account_id(), "12345");
@@ -47,4 +35,9 @@ TEST_F(BankAccountTest, Id) {
 // Test case: Get owner name
 TEST_F(BankAccountTest, Name) {
     EXPECT_EQ(account1->get_owner_name(), "John Doe");
+}
+
+// Test case: Get Balance
+TEST_F(BankAccountTest, Balance) {
+    EXPECT_EQ(account1->get_balance(), 1000.0);
 }

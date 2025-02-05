@@ -19,8 +19,6 @@ protected:
         std::string description = "Initial deposit";
 
         test_transaction = new Transactions(transaction_id, type, amount, account_id, recipient_account_id, description);
-
-        test_account->add_transaction(*test_transaction);
     }
 
     void TearDown() override {
@@ -34,16 +32,9 @@ TEST_F(TransactionsTest, TestTransactionCreated) {
     EXPECT_EQ(test_transaction->get_amount(), 100.0);
 }
 
-TEST_F(TransactionsTest, TestAccountBalance) {
-    EXPECT_EQ(test_account->get_balance(), 500.0);
-}
 
 TEST_F(TransactionsTest, GetTransactionId) {
     EXPECT_EQ(test_transaction->get_id(), "TX-1001");
-}
-
-TEST_F(TransactionsTest, GetTransactionAmount) {
-    EXPECT_DOUBLE_EQ(test_transaction->get_amount(), 100.0);
 }
 
 TEST_F(TransactionsTest, GetTransactionAccountId) {

@@ -1,10 +1,10 @@
 #ifndef TRANSACTIONS_H
 #define TRANSACTIONS_H
 
+#include "TransactionTypes.h"
+
 #include <iostream>
 #include <string>
-
-#include "TransactionTypes.h"
 
 class BankAccount;
 
@@ -25,8 +25,6 @@ class Transactions {
         std::string transaction_id_;
         double amount_;
         TransactionTypes type_;
-
-
 };
 
 #endif //TRANSACTIONS_H
