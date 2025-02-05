@@ -250,6 +250,7 @@ void DataBaseManager::withdraw_from_account(const std::string& id, double amount
 
 void DataBaseManager::transfer(const std::string& from_id, const std::string& to_id, double amount) {
     try {
+        std::cerr << "Attempting to tranfer money from " << from_id << " to " << to_id<<std::endl;
         db_.exec("BEGIN TRANSACTION;");  // Start the transaction
 
         // Checks for source and destination accounts
@@ -265,6 +266,10 @@ void DataBaseManager::transfer(const std::string& from_id, const std::string& to
         
         double from_balance = query.getColumn(1).getDouble();
         
+        // Reset query before reusing it
+        query.reset();
+        query.clearBindings();
+
         // Check destination account
         query.bind(1, to_id);
         if (!query.executeStep()) {
